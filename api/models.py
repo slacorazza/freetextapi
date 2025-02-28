@@ -34,3 +34,52 @@ class Material(models.Model):
         Returns the string representation of the Material instance.
         """
         return self.material_name
+    
+class Order(models.Model):
+    """
+    Model representing an order for a material.
+    
+    Attributes:
+        material (Material): The material for the order.
+        quantity (int): The quantity of the material in the order.
+        order_date (DateTime): The date of the order.
+    """
+    id = models.AutoField(primary_key=True)
+    order_id = models.CharField(max_length=255)
+    material_code = models.CharField(max_length=255)
+    quantity = models.IntegerField()
+    unit_price = models.IntegerField()
+    total_price = models.IntegerField()
+    order_date = models.DateTimeField()
+    costumer_id = models.CharField(max_length=10)
+    costumer_name = models.CharField(max_length=255)
+    status = models.CharField(max_length=255)
+    is_free_text = models.BooleanField()
+
+
+    def __str__(self):
+        """
+        Returns the string representation of the Order instance.
+        """
+        return f'{self.material} - {self.quantity} - {self.order_date}'
+
+class Inventory(models.Model):
+    """
+    Model representing the inventory of a material.
+    
+    Attributes:
+        material (Material): The material in the inventory.
+        quantity (int): The quantity of the material in the inventory.
+    """
+    id = models.AutoField(primary_key=True)
+    material_code = models.CharField(max_length=255, blank=True, null=True)
+    material_name = models.CharField(max_length=255)
+    current_stock = models.IntegerField()
+    is_free_text = models.BooleanField()
+    unit_price = models.IntegerField()
+
+    def __str__(self):
+        """
+        Returns the string representation of the Inventory instance.
+        """
+        return f'{self.material_code} - {self.quantity}'

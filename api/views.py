@@ -2,8 +2,8 @@ from django.shortcuts import render
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .models import Material
-from .serializers import MaterialSerializer
+from .models import Material, Order, Inventory
+from .serializers import MaterialSerializer, OrderSerializer, InventorySerializer
 from rest_framework.pagination import PageNumberPagination
 
 # Custom view for listing Material objects with optional filtering and pagination
@@ -57,3 +57,71 @@ class KPIList(APIView):
 
     def get(self, request, format=None):
         return Response({'Total_OC': 147000, 'Total_OC_Amount': '$20.2K', 'Total_OC_FT': 300000, 'Total_OC_FT_Amount': '$30.2K'})
+    
+class OrderList(APIView):
+    """
+    View to list Order objects with optional filtering and pagination.
+
+    Methods:
+        get(request, format=None): Handles GET requests to retrieve a list of orders.
+    """
+
+    def get(self, request, format=None):
+        """
+        Handles GET requests to retrieve a list of orders.
+
+        Query Parameters:
+            material_code (list of str): List of material codes to filter orders.
+            costumer_id (list of str): List of costumer IDs to filter orders.
+            status (list of str): List of statuses to filter orders.
+
+        Returns:
+            Response: Paginated response with serialized order data.
+        """
+        material_codes = request.query_params.getlist('material_code')
+        costumer_ids = request.query_params.getlist('costumer_id')
+        statuses = request.query_params.getlist('status')
+
+        # Filter orders by material code, costumer ID, and status
+        orders = Order.objects.all()
+        if material_codes:
+            orders = orders.filter(material_code__in=material_codes)
+        if costumer_ids:
+            orders = orders.filter(costumer_id__in=costumer_ids)
+        if statuses:
+            orders = orders.filter(status__in=statuses)
+
+        paginator = PageNumberPagination()
+        paginated_orders = paginator.paginate_queryset(orders, request)
+        serializer = OrderSerializer(paginated_orders, many=True)
+        return paginator.get_paginated_response(serializer.data)
+    
+class InventoryList(APIView):
+    """
+    View to list Inventory objects with optional filtering and pagination.
+
+    Methods:
+        get(request, format=None): Handles GET requests to retrieve a list of inventory items.
+    """
+
+    def get(self, request, format=None):
+        """
+        Handles GET requests to retrieve a list of inventory items.
+
+        Query Parameters:
+            material_code (list of str): List of material codes to filter inventory items.
+
+        Returns:
+            Response: Paginated response with serialized inventory data.
+        """
+        material_codes = request.query_params.getlist('material_code')
+
+        # Filter inventory items by material code
+        inventory = Inventory.objects.all()
+        if material_codes:
+            inventory = inventory.filter(material_code__in=material_codes)
+
+        paginator = PageNumberPagination()
+        paginated_inventory = paginator.paginate_queryset(inventory, request)
+        serializer = InventorySerializer(paginated_inventory, many=True)
+        return paginator.get_paginated_response(serializer.data)
