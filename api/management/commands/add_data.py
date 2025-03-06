@@ -12,6 +12,24 @@ class Command(BaseCommand):
     """
     help = 'Add data to the database from CSV file'
 
+    def code_to_region(self, code):
+        """
+        Convert a code to a number between 1 and 4 deterministically.
+
+        Args:
+            code (str): The input code.
+
+        Returns:
+            int: A number between 0 and 3.
+        """
+        # Sum the ASCII values of the characters in the code
+        ascii_sum = sum(ord(char) for char in code)
+        module = ascii_sum % 4
+
+        regions = ['North', 'South', 'East', 'West']
+        return regions[module]
+        
+
 
     def add_inventory(self):
          # Path to the CSV file
@@ -58,8 +76,8 @@ class Command(BaseCommand):
                 employeename = row['employee_name']
                 status = row['status']
                 is_free_text = row['is_free_text'].lower() == 'true'
-                region_ = random.choice(['North', 'South', 'East', 'West'])
-                print(order_id, material_code, quantity, unit_price, total_price, order_date, employeeid, employeename, status, is_free_text)
+                region_ = self.code_to_region(order_id)
+              
                 # Create the Order
 
                 Order.objects.create(
