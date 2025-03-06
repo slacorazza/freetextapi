@@ -107,11 +107,22 @@ class OrderList(APIView):
             orders = orders.filter(status__in=statuses)
         if o_id:
             orders = orders.filter(order_id=o_id)
+        amount = orders.aggregate(total_amount=Sum('total_price'))['total_amount']
+        ft_count = orders.filter(is_free_text=True).count()
+        ft_amount = orders.filter(is_free_text=True).aggregate(total_amount=Sum('total_price'))['total_amount']
+        
+        new_data = {
+            'total_amount': amount,
+            'ft_count': ft_count,
+            'ft_amount': ft_amount
+        }
 
         paginator = PageNumberPagination()
         paginated_orders = paginator.paginate_queryset(orders, request)
         serializer = OrderSerializer(paginated_orders, many=True)
-        return paginator.get_paginated_response(serializer.data)
+        paginated_response = paginator.get_paginated_response(serializer.data)
+        paginated_response.data = {**new_data, **paginated_response.data}
+        return paginated_response
     
 class InventoryList(APIView):
     """
