@@ -28,6 +28,7 @@ class Material(models.Model):
     producto_nuevo = models.BooleanField()
     material_code = models.CharField(max_length=255, blank=True, null=True)
     predicciones = models.CharField(max_length=255, blank=True, null=True)
+    order = models.ForeignKey('Order', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         """
@@ -51,8 +52,8 @@ class Order(models.Model):
     unit_price = models.IntegerField()
     total_price = models.IntegerField()
     order_date = models.DateTimeField()
-    costumer_id = models.CharField(max_length=10)
-    costumer_name = models.CharField(max_length=255)
+    employee_id = models.CharField(max_length=10)
+    employee_name = models.CharField(max_length=255)
     status = models.CharField(max_length=255)
     is_free_text = models.BooleanField()
 

@@ -63,14 +63,16 @@ class KPIList(APIView):
     ft_amount_percentage = (total_orders_ft_amount / total_orders_amount) * 100
 
     def get(self, request, format=None):
+
         return Response({
-            'Total_OC': self.total_orders,
-            'Total_OC_Amount': self.total_orders_amount,
-            'Total_OC_FT': self.total_orders_ft,
-            'Total_OC_FT_Amount': self.total_orders_ft_amount,
-            'FT_PERCENTAGE': self.ft_percentage,
-            'FT_AMOUNT_PERCENTAGE': self.ft_amount_percentage
+            'total_oc': self.total_orders,
+            'total_oc_amount': self.total_orders_amount,
+            'total_oc_ft': self.total_orders_ft,
+            'total_oc_ft_amount': self.total_orders_ft_amount,
+            'ft_percentage': self.ft_percentage,
+            'ft_amount_percentage': self.ft_amount_percentage
         })
+
     
 class OrderList(APIView):
     """
