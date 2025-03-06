@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from .models import Material, Order, Inventory
 from .serializers import MaterialSerializer, OrderSerializer, InventorySerializer
 from rest_framework.pagination import PageNumberPagination
+from django.db.models import Sum
 
 # Custom view for listing Material objects with optional filtering and pagination
 class MaterialList(APIView):
@@ -54,9 +55,22 @@ class KPIList(APIView):
     Methods:
         get(request, format=None): Handles GET requests to retrieve a list of materials.
     """
+    total_orders = Order.objects.all().count()
+    total_orders_amount = Order.objects.all().aggregate(total=Sum('total_price'))['total']
+    total_orders_ft = Order.objects.filter(is_free_text=True).count()
+    total_orders_ft_amount = Order.objects.filter(is_free_text=True).aggregate(total=Sum('total_price'))['total']
+    ft_percentage = (total_orders_ft / total_orders) * 100
+    ft_amount_percentage = (total_orders_ft_amount / total_orders_amount) * 100
 
     def get(self, request, format=None):
-        return Response({'Total_OC': 147000, 'Total_OC_Amount': '$20.2K', 'Total_OC_FT': 300000, 'Total_OC_FT_Amount': '$30.2K'})
+        return Response({
+            'Total_OC': self.total_orders,
+            'Total_OC_Amount': self.total_orders_amount,
+            'Total_OC_FT': self.total_orders_ft,
+            'Total_OC_FT_Amount': self.total_orders_ft_amount,
+            'FT_PERCENTAGE': self.ft_percentage,
+            'FT_AMOUNT_PERCENTAGE': self.ft_amount_percentage
+        })
     
 class OrderList(APIView):
     """
@@ -81,6 +95,7 @@ class OrderList(APIView):
         material_codes = request.query_params.getlist('material_code')
         costumer_ids = request.query_params.getlist('costumer_id')
         statuses = request.query_params.getlist('status')
+        o_id = request.query_params.get('order_id')
 
         # Filter orders by material code, costumer ID, and status
         orders = Order.objects.all()
@@ -90,6 +105,8 @@ class OrderList(APIView):
             orders = orders.filter(costumer_id__in=costumer_ids)
         if statuses:
             orders = orders.filter(status__in=statuses)
+        if o_id:
+            orders = orders.filter(order_id=o_id)
 
         paginator = PageNumberPagination()
         paginated_orders = paginator.paginate_queryset(orders, request)
