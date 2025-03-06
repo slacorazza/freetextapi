@@ -13,7 +13,7 @@ class OrderSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Order
-        fields = ['order_id', 'material_code', 'quantity', 'unit_price', 'total_price', 'order_date', 'employee_id', 'employee_name', 'status', 'is_free_text']
+        fields = ['order_id', 'material_code', 'quantity', 'unit_price', 'total_price', 'order_date', 'employee_id', 'employee_name', 'status', 'is_free_text', 'region']
 
 class MaterialSerializer(serializers.ModelSerializer):
     """

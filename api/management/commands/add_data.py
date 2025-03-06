@@ -4,6 +4,7 @@ from api.models import Material, Inventory, Order
 from django.conf import settings
 import os
 from datetime import datetime
+import random
 
 class Command(BaseCommand):
     """
@@ -57,6 +58,7 @@ class Command(BaseCommand):
                 employeename = row['employee_name']
                 status = row['status']
                 is_free_text = row['is_free_text'].lower() == 'true'
+                region_ = random.choice(['North', 'South', 'East', 'West'])
                 print(order_id, material_code, quantity, unit_price, total_price, order_date, employeeid, employeename, status, is_free_text)
                 # Create the Order
 
@@ -70,7 +72,8 @@ class Command(BaseCommand):
                     employee_id=employeeid,
                     employee_name=employeename,
                     status=status,
-                    is_free_text=is_free_text
+                    is_free_text=is_free_text,
+                    region=region_,
                 )
                 print('Order data added successfully')
         self.stdout.write(self.style.SUCCESS('Order data added successfully'))

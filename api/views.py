@@ -98,6 +98,7 @@ class OrderList(APIView):
         costumer_ids = request.query_params.getlist('costumer_id')
         statuses = request.query_params.getlist('status')
         o_id = request.query_params.get('order_id')
+        region = request.query_params.get('region')
 
         # Filter orders by material code, costumer ID, and status
         orders = Order.objects.all()
@@ -109,6 +110,9 @@ class OrderList(APIView):
             orders = orders.filter(status__in=statuses)
         if o_id:
             orders = orders.filter(order_id=o_id)
+        if region:
+            orders = orders.filter(region=region)
+            
         amount = orders.aggregate(total_amount=Sum('total_price'))['total_amount']
         ft_count = orders.filter(is_free_text=True).count()
         ft_amount = orders.filter(is_free_text=True).aggregate(total_amount=Sum('total_price'))['total_amount']

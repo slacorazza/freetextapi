@@ -56,13 +56,14 @@ class Order(models.Model):
     employee_name = models.CharField(max_length=255)
     status = models.CharField(max_length=255)
     is_free_text = models.BooleanField()
+    region = models.CharField(max_length=255)
 
 
     def __str__(self):
         """
         Returns the string representation of the Order instance.
         """
-        return f'{self.material} - {self.quantity} - {self.order_date}'
+        return f'{self.order_date}'
 
 class Inventory(models.Model):
     """
@@ -83,4 +84,4 @@ class Inventory(models.Model):
         """
         Returns the string representation of the Inventory instance.
         """
-        return f'{self.material_code} - {self.quantity}'
+        return f'{self.material_code}'
